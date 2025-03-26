@@ -1,0 +1,26 @@
+# IDE
+.vscode/
+*/.vscode/
+.idea/
+*/.idea/
+
+# Dependencies
+php_app/vendor/
+
+# Logs
+php_app/logs/
+*.log
+
+# Environment files
+php_app/.env
+php_app/.env.*
+!php_app/.env.example
+
+# Composer
+php_app/composer.phar
+php_app/composer.lock
+php_app//vendor/
+
+# Cache and temporary files
+*.cache
+*.tmp
