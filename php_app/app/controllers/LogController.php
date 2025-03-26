@@ -2,12 +2,25 @@
 
 namespace App\Controllers;
 
+use DI\Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\LogModel;
 
+use PDO;
+
 class LogController
 {
+    private $app;
+    private $pdo;
+
+    public function __construct(PDO $pdo) # Container $container)
+    {
+        // $this->pdo = $container->get('pdo');
+        $this->pdo = $pdo;
+    }
+    
+
     public function addLog(Request $request, Response $response): Response
     {
         $body = $request->getBody();
@@ -19,7 +32,7 @@ class LogController
             return $response;
         }
 
-        $log = new LogModel();
+        $log = new LogModel($this->pdo);
         $log->host = $data['host'] ?? 'unknown';
         $log->host_process = $data['host_process'] ?? null;
         $log->log_level = $data['log_level'] ?? 'INFO';
@@ -44,7 +57,7 @@ class LogController
         $timestampFrom = $queryParams['timestamp_from'] ?? null;
         $timestampTo = $queryParams['timestamp_to'] ?? null;
 
-        $logs = LogModel::getLogs($host, $hostProcess, $logLevel, $timestampFrom, $timestampTo);
+        $logs = LogModel::getLogs($this->pdo, $host, $hostProcess, $logLevel, $timestampFrom, $timestampTo);
 
         $response = $response->withHeader('Content-Type', 'application/json');
         $response->getBody()->write(json_encode($logs));
@@ -54,7 +67,7 @@ class LogController
 
     public function viewLogs(Request $request, Response $response): Response
     {
-        $logs = LogModel::getLogs();
+        $logs = LogModel::getLogs($this->pdo);
 
         ob_start();
         include __DIR__ . '/../views/logs.php';

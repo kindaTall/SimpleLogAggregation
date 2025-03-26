@@ -5,9 +5,21 @@ use App\Models\LogModel;
 
 class LogModelTest extends TestCase
 {
+    private $app;
+    private $pdo;
+
+    protected function setUp(): void
+    {
+        // Load the application and database connection
+        $this->app = require __DIR__ . '/../app/bootstrap.php';
+        $routes = $app->getRouteCollector()->getRoutes();
+        $this->pdo = $this->app->getContainer()->get('pdo');
+    }
+    
+
     public function testSaveLog(): void
     {
-        $log = new LogModel();
+        $log = new LogModel($this->pdo);
         $log->host = 'test-server';
         $log->host_process = 'api';
         $log->log_level = 'INFO';
@@ -22,7 +34,7 @@ class LogModelTest extends TestCase
 
     public function testGetLogs(): void
     {
-        $log = new LogModel();
+        $log = new LogModel($this->pdo);
         $log->host = 'test-server';
         $log->host_process = 'api';
         $log->log_level = 'INFO';
@@ -31,7 +43,7 @@ class LogModelTest extends TestCase
 
         $log->save();
 
-        $logs = LogModel::getLogs('test-server', 'api', 'INFO');
+        $logs = LogModel::getLogs($this->pdo, 'test-server', 'api', 'INFO');
 
         $this->assertIsArray($logs);
         $this->assertNotEmpty($logs);

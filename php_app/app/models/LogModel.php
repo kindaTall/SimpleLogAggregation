@@ -14,20 +14,17 @@ class LogModel
     public $timestamp;
     public $created_at;
 
-    private static function db(): PDO
+    private $db;
+
+    public function __construct(PDO $db)
     {
-        $config = include __DIR__ . '/../../config/database.php';
-        $db = new PDO('sqlite:' . $config['connections']['sqlite']['database']);
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        return $db;
+        $this->db = $db;
     }
 
     public function save(): int
     {
-        $db = self::db();
-
         $sql = "INSERT INTO logs (host, host_process, log_level, log_message, timestamp) VALUES (:host, :host_process, :log_level, :log_message, :timestamp)";
-        $stmt = $db->prepare($sql);
+        $stmt = $this->db->prepare($sql);
         $stmt->execute([
             ':host' => $this->host,
             ':host_process' => $this->host_process,
@@ -36,13 +33,11 @@ class LogModel
             ':timestamp' => $this->timestamp,
         ]);
 
-        return $db->lastInsertId();
+        return $this->db->lastInsertId();
     }
 
-    public static function getLogs(string $host = null, string $hostProcess = null, string $logLevel = null, string $timestampFrom = null, string $timestampTo = null): array
+    public static function getLogs(PDO $db, string $host = null, string $hostProcess = null, string $logLevel = null, string $timestampFrom = null, string $timestampTo = null): array
     {
-        $db = self::db();
-
         $sql = "SELECT * FROM logs WHERE 1=1";
 
         if ($host) {

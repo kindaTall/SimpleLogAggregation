@@ -2,9 +2,32 @@
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$config = include __DIR__ . '/../config/database.php';
+use Dotenv\Dotenv;
 
-$db = new PDO('sqlite:' . $config['connections']['sqlite']['database']);
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
+$dbConnection = $_ENV['DB_CONNECTION'];
+
+if ($dbConnection === 'sqlite') {
+    $db = new PDO('sqlite:' . __DIR__ . '/../' . $_ENV['DB_DATABASE']);
+} elseif ($dbConnection === 'mysql') {
+    $host = $_ENV['MYSQL_DB_HOST'];
+    $dbname = $_ENV['MYSQL_DB_DATABASE'];
+    $username = $_ENV['MYSQL_DB_USERNAME'];
+    $password = $_ENV['MYSQL_DB_PASSWORD'];
+
+    try {
+        $db = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    } catch (PDOException $e) {
+        echo "Connection failed: " . $e->getMessage() . "\n";
+        exit(1);
+    }
+} else {
+    echo "Invalid DB_CONNECTION: " . $dbConnection . "\n";
+    exit(1);
+}
+
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 $sql = "

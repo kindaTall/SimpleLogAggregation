@@ -24,3 +24,4 @@ php_app//vendor/
 # Cache and temporary files
 *.cache
 *.tmp
+php_app/database/logs.sqlite
