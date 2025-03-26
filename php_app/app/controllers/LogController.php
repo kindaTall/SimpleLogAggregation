@@ -14,9 +14,8 @@ class LogController
     private $app;
     private $pdo;
 
-    public function __construct(PDO $pdo) # Container $container)
+    public function __construct(PDO $pdo)
     {
-        // $this->pdo = $container->get('pdo');
         $this->pdo = $pdo;
     }
     
@@ -65,15 +64,15 @@ class LogController
         return $response;
     }
 
-    public function viewLogs(Request $request, Response $response): Response
+    public function viewLogs(Request $request, Response $response, Container $container): Response
     {
         $logs = LogModel::getLogs($this->pdo);
 
-        ob_start();
-        include __DIR__ . '/../views/logs.php';
-        $html = ob_get_clean();
+        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../views');
+        $twig = new \Twig\Environment($loader);
 
-        $response->getBody()->write($html);
+        $template = $twig->load('logs.twig');
+        $response->getBody()->write($template->render(['logs' => $logs]));
         return $response;
     }
 }

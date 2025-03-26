@@ -1,0 +1,63 @@
+{% include 'header.twig' %}
+
+    <h1>Logs</h1>
+    <table id="example" class="display compact hover" style="width:100%">
+        <caption>Log Entries</caption>
+        <thead>
+            <tr class="filters">
+                <th><input type="text" placeholder="Host" data-index="0" /></th>
+                <th><input type="text" placeholder="Host Process" data-index="1" /></th>
+                <th><input type="text" placeholder="Log Level" data-index="2" /></th>
+                <th><input type="text" placeholder="Log Message" data-index="3" /></th>
+                <th><input type="text" placeholder="Timestamp" data-index="4" /></th>
+            </tr>
+            <tr>
+                <th>Host</th>
+                <th>Host Process</th>
+                <th>Log Level</th>
+                <th>Log Message</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.host }}</td>
+                <td>{{ log.host_process }}</td>
+                <td>{{ log.log_level }}</td>
+                <td>{{ log.log_message }}</td>
+                <td>{{ log.timestamp }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+    <script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
+    <script>
+        // DataTable
+        var table = $('#example').DataTable({
+            scrollY: '60vh',
+            scrollCollapse: true,
+            searching: false,
+            paging: false,
+            autoWidth: true
+        });
+    
+        // Filter event handler
+        $(table.table().container()).on('keyup', 'thead tr.filters input', function () {
+            table
+                .column($(this).data('index'))
+                .search(this.value)
+                .draw();
+        });
+    </script>
+    <style>
+        table.dataTable td {
+            font-size: small;
+        }
+    </styles>
+
+{% include 'footer.twig' %}
