@@ -1,0 +1,130 @@
+openapi: 3.0.0
+info:
+  title: 'Simple Log Aggregation API'
+  version: '1.0'
+paths:
+  /api/logs:
+    get:
+      tags:
+        - Logs
+      summary: 'Retrieve log entries'
+      description: 'Returns a list of log entries, optionally filtered by query parameters.'
+      operationId: 2159e1e7e36f0b24238705e3b871f9aa
+      parameters:
+        -
+          name: host
+          in: query
+          description: 'Filter by host name'
+          required: false
+          schema:
+            type: string
+        -
+          name: host_process
+          in: query
+          description: 'Filter by host process'
+          required: false
+          schema:
+            type: string
+        -
+          name: log_level
+          in: query
+          description: 'Filter by log level'
+          required: false
+          schema:
+            type: string
+        -
+          name: timestamp_from
+          in: query
+          description: 'Filter logs from this timestamp (inclusive)'
+          required: false
+          schema:
+            type: string
+            format: date-time
+        -
+          name: timestamp_to
+          in: query
+          description: 'Filter logs up to this timestamp (inclusive)'
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: 'List of log entries'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties: { id: { type: integer }, host: { type: string }, host_process: { type: string }, log_level: { type: string }, log_message: { type: string }, timestamp: { type: string, format: date-time } }
+                  type: object
+    post:
+      tags:
+        - Logs
+      summary: 'Add a new log entry'
+      description: 'Receives log data in JSON format and stores it.'
+      operationId: ec71385f89bdeeaadfdcd70cc545d527
+      requestBody:
+        description: 'Log data'
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                host:
+                  type: string
+                  example: server1.example.com
+                host_process:
+                  type: string
+                  example: nginx
+                log_level:
+                  type: string
+                  example: ERROR
+                log_message:
+                  type: string
+                  example: 'Failed to connect to database.'
+                timestamp:
+                  type: string
+                  format: date-time
+                  example: '2023-10-27T10:00:00Z'
+              type: object
+      responses:
+        '201':
+          description: 'Log created successfully'
+          content:
+            application/json:
+              schema:
+                properties:
+                  id: { type: integer, example: 123 }
+                type: object
+        '400':
+          description: 'Invalid JSON input'
+          content:
+            application/json:
+              schema:
+                properties:
+                  error: { type: string, example: 'Invalid JSON' }
+                type: object
+  /api/health:
+    get:
+      tags:
+        - Health
+      summary: 'Check the health of the API'
+      description: 'Returns a simple status message to indicate if the API is operational.'
+      operationId: 41c135f9a74239817bebaf85eb3f68cf
+      responses:
+        '200':
+          description: 'API status is OK'
+          content:
+            application/json:
+              schema:
+                properties:
+                  status: { type: string, example: OK }
+                type: object
+tags:
+  -
+    name: Logs
+    description: Logs
+  -
+    name: Health
+    description: Health

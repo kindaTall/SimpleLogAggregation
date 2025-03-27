@@ -2,12 +2,11 @@
 
 use Slim\App;
 use App\Controllers\LogController;
-use Twig\Environment as TwigEnvironment; 
-
+use Twig\Environment as TwigEnvironment;
 
 return function (App $app) {
-    $app->get('/', function ($request, $response, $args)  { 
-        $twig = $this->get(TwigEnvironment::class); 
+    $app->get('/', function ($request, $response, $args) {
+        $twig = $this->get(TwigEnvironment::class);
         $template = $twig->load('home.twig');
         $response->getBody()->write($template->render(['name' => 'SimpleLogAggregation']));
         return $response;

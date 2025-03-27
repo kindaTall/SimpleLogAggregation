@@ -13,9 +13,10 @@ class LogModelTest extends TestCase
         // Load the application and database connection
         $this->app = require __DIR__ . '/../app/bootstrap.php';
         $routes = $app->getRouteCollector()->getRoutes();
-        $this->pdo = $this->app->getContainer()->get(PDO::class);;
+        $this->pdo = $this->app->getContainer()->get(PDO::class);
+        ;
     }
-    
+
 
     public function testSaveLog(): void
     {
