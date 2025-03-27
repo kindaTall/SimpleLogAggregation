@@ -41,6 +41,13 @@ class LogTest extends TestCase
         sleep(1);
     }
 
+    // New private helper function
+    private function getUrl(string $name, array $data = [], array $queryParams = []): string
+    {
+        $relativeUrl = $this->routeParser->urlFor($name, $data, $queryParams);
+        return 'http://localhost:'. $this->port . $relativeUrl;
+    }
+
     protected function kill($process) {
         if (strncasecmp(PHP_OS, 'WIN', 3) == 0) {
             $status = proc_get_status($process);
@@ -64,8 +71,7 @@ class LogTest extends TestCase
     public function testViewLogs()
     {
         // Test the /logs endpoint, which is a pure GET endpoint
-        $url = $this->routeParser->urlFor('viewLogs', [], []);
-        $url = 'http://localhost:'. $this->port . $url;
+        $url = $this->getUrl('viewLogs');
         
         // Initialize cURL session
         $ch = curl_init();
@@ -101,8 +107,7 @@ class LogTest extends TestCase
     {
         // Test the /logs endpoint, which is a pure POST endpoint
         // Prepare the URL and data for the POST request
-        $url = $this->routeParser->urlFor('addLog', [], []);
-        $url = 'http://localhost:'. $this->port . $url;
+        $url = $this->getUrl('addLog');
 
         $data = [
             "host" => "test-server",
@@ -147,8 +152,7 @@ class LogTest extends TestCase
     public function testGetLogs(): void
     {
         // Test the /logs endpoint, which is a pure GET endpoint
-        $url = $this->routeParser->urlFor('getLogs', [], []);
-        $url = 'http://localhost:'. $this->port . $url;
+        $url = $this->getUrl('getLogs');
         
         // Initialize cURL session
         $ch = curl_init();
@@ -206,5 +210,40 @@ class LogTest extends TestCase
         $response = json_decode($curlOutput, true);
         $this->assertArrayHasKey('status', $response, "Response does not contain 'status' key.");
         $this->assertEquals('OK', $response['status'], "Response status is not 'OK'.");
+    }
+
+    public function testHomeRoute(): void
+    {
+        // Test the / endpoint (named 'home')
+        $url = $this->getUrl('home');
+        
+        // Initialize cURL session
+        $ch = curl_init();
+        
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        // Execute the request
+        $response = curl_exec($ch);
+        
+        // Check for cURL errors
+        if (curl_errno($ch)) {
+            $this->fail('cURL error: ' . curl_error($ch));
+        }
+        
+        // Get HTTP status code
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $this->assertEquals(200, $httpCode, "Expected HTTP 200 status code for home route");
+        
+        // Close cURL session
+        curl_close($ch);
+        
+        $this->assertNotEmpty($response, "Home route response is empty.");
+        $this->assertStringContainsString('<!DOCTYPE html>', $response, "Home response does not contain expected HTML content.");
+        $this->assertStringContainsString('<title>SimpleLogAggregation</title>', $response, "Home response does not contain expected title.");
+        // Check for a specific string rendered by Twig
+        $this->assertStringContainsString('Welcome to the SimpleLogAggregation', $response, "Home response does not contain expected welcome message."); 
+        $this->assertStringContainsString('<footer>', $response, "Home response does not contain expected HTML footer.");
     }
 }

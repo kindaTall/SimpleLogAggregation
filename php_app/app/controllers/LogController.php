@@ -6,17 +6,20 @@ use DI\Container;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\LogModel;
+use Twig\Environment as TwigEnvironment; // Alias to avoid naming conflict if needed
 
 use PDO;
 
 class LogController
 {
-    private $app;
     private $pdo;
+    private $twig; 
 
-    public function __construct(PDO $pdo)
+    
+    public function __construct(PDO $pdo, TwigEnvironment $twig)
     {
         $this->pdo = $pdo;
+        $this->twig = $twig; 
     }
     
 
@@ -64,14 +67,12 @@ class LogController
         return $response;
     }
 
-    public function viewLogs(Request $request, Response $response, Container $container): Response
+    public function viewLogs(Request $request, Response $response): Response
     {
         $logs = LogModel::getLogs($this->pdo);
 
-        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../views');
-        $twig = new \Twig\Environment($loader);
-
-        $template = $twig->load('logs.twig');
+        // Use the injected twig environment
+        $template = $this->twig->load('logs.twig');
         $response->getBody()->write($template->render(['logs' => $logs]));
         return $response;
     }

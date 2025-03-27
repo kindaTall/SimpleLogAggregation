@@ -19,6 +19,10 @@ $app->getContainer()->set(Psr\Http\Message\ResponseFactoryInterface::class, func
 $dbConfig = require __DIR__ . '/../config/database.php';
 $dbConfig($app);
 
+// Load Twig configuration
+$twigConfig = require __DIR__ . '/../config/twig.php';
+$twigConfig($app);
+
 // Add Routing Middleware
 $app->addRoutingMiddleware();
 
