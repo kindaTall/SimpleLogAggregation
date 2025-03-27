@@ -6,6 +6,9 @@
 
 # Dependencies
 php_app/vendor/
+python_client/.venv/
+python_client/venv/
+
 
 # Logs
 php_app/logs/
@@ -15,6 +18,9 @@ php_app/logs/
 php_app/.env
 php_app/.env.*
 !php_app/.env.example
+python_client/.env
+python_client/.env.*
+!python_client/.env.example
 
 # Composer
 php_app/composer.phar
@@ -25,3 +31,11 @@ php_app//vendor/
 *.cache
 *.tmp
 php_app/database/logs.sqlite
+python_client/.pytest_cache/
+python_client/.mypy_cache/
+python_client/.coverage
+__pycache__/
+*.egg-info/
+*.egg
+
+
