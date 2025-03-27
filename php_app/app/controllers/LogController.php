@@ -75,4 +75,11 @@ class LogController
         $response->getBody()->write($template->render(['logs' => $logs]));
         return $response;
     }
+
+    public function healthCheck(Request $request, Response $response): Response
+    {
+        $response = $response->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write(json_encode(['status' => 'OK']));
+        return $response;
+    }
 }

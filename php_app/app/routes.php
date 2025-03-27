@@ -23,4 +23,6 @@ return function (App $app) {
         $response = $controller->viewLogs($request, new \Slim\Psr7\Response(), $container);
         return $response;
     })->setName('viewLogs');
+
+    $app->get('/api/health', [LogController::class, 'healthCheck'])->setName('healthCheck');
 };

@@ -90,8 +90,11 @@ class LogTest extends TestCase
         curl_close($ch);
         
         $this->assertNotEmpty($response, "Response is empty.");
+        $this->assertStringContainsString('<!DOCTYPE html>', $response, "Response does not contain expected HTML content.");
         $this->assertStringContainsString('<h1>Logs</h1>', $response, "Response does not contain expected HTML content.");
-        $this->assertStringContainsString('<table>', $response, "Response does not contain expected HTML table.");
+        $this->assertStringContainsString('<table id="example"', $response, "Response does not contain expected HTML table.");
+        $this->assertStringContainsString('</table>', $response, "Response does not contain expected HTML table.");
+        $this->assertStringContainsString('<footer>', $response, "Response does not contain expected HTML footer.");
     }
 
     public function testAddLog(): void
@@ -170,5 +173,38 @@ class LogTest extends TestCase
         curl_close($ch);
 
         $this->assertNotEmpty($curlOutput, "cURL output is empty.");
+    }
+
+    public function testHealthCheck(): void
+    {
+        // Test the /api/health endpoint, which is a pure GET endpoint
+        $url = 'http://localhost:'. $this->port . '/api/health';
+        
+        // Initialize cURL session
+        $ch = curl_init();
+        
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        // Execute the request
+        $curlOutput = curl_exec($ch);
+        
+        // Check for cURL errors
+        if (curl_errno($ch)) {
+            $this->fail('cURL error: ' . curl_error($ch));
+        }
+        
+        // Get HTTP status code
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $this->assertEquals(200, $httpCode, "Expected HTTP 200 status code");
+        
+        // Close cURL session
+        curl_close($ch);
+
+        $this->assertNotEmpty($curlOutput, "cURL output is empty.");
+        $response = json_decode($curlOutput, true);
+        $this->assertArrayHasKey('status', $response, "Response does not contain 'status' key.");
+        $this->assertEquals('OK', $response['status'], "Response status is not 'OK'.");
     }
 }
